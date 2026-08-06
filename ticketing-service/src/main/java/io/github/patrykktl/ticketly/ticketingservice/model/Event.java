@@ -6,10 +6,13 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import lombok.Getter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -26,7 +29,12 @@ public abstract class Event {
     private BigDecimal basePrice;
     private Integer totalSeats;
     private Integer availableSeats;
+
     @Enumerated(EnumType.STRING)
     private EventStatus status;
+
     private LocalDateTime createdAt;
+
+    @OneToMany(mappedBy = "reservation")
+    private final List<Reservation> reservations = new ArrayList<>();
 }
