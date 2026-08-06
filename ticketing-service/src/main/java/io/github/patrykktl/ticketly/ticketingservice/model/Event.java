@@ -46,6 +46,6 @@ public abstract class Event {
 
     private LocalDateTime createdAt;
 
-    @OneToMany(mappedBy = "reservation")
+    @OneToMany(mappedBy = "event")
     private final List<Reservation> reservations = new ArrayList<>();
 }
