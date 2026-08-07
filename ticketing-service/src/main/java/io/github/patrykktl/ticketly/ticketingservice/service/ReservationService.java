@@ -65,4 +65,10 @@ public class ReservationService {
         reservation.setStatus(ReservationStatus.CONFIRMED);
         return ReservationMapper.mapToDto(reservation);
     }
+
+    public ReservationDto findById(Integer reservationId) {
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new EntityNotFoundException("Reservation of given id cannot be found."));
+        return ReservationMapper.mapToDto(reservation);
+    }
 }
