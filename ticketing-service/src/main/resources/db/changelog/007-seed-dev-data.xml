@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="007-seed-dev-data" author="patryk-ktl" context="dev">
+        <comment>Development seed data for events and reservations</comment>
+
+        <!-- 1. BASE EVENT TABLE INSERTS -->
+        <insert tableName="event">
+            <column name="id" valueNumeric="1"/>
+            <column name="title" value="World Tour 2026"/>
+            <column name="venue" value="Madison Square Garden"/>
+            <column name="city" value="New York"/>
+            <column name="starts_at" value="2026-09-15 20:00:00"/>
+            <column name="base_price" valueNumeric="120.00"/>
+            <column name="total_seats" valueNumeric="15000"/>
+            <column name="available_seats" valueNumeric="14980"/>
+            <column name="status" value="ON_SALE"/>
+            <column name="created_at" value="2026-08-01 10:00:00"/>
+        </insert>
+        <insert tableName="event">
+            <column name="id" valueNumeric="2"/>
+            <column name="title" value="Jazz Night Live"/>
+            <column name="venue" value="Blue Note"/>
+            <column name="city" value="Chicago"/>
+            <column name="starts_at" value="2026-10-01 21:00:00"/>
+            <column name="base_price" valueNumeric="45.00"/>
+            <column name="total_seats" valueNumeric="200"/>
+            <column name="available_seats" valueNumeric="0"/>
+            <column name="status" value="SOLD_OUT"/>
+            <column name="created_at" value="2026-08-01 10:30:00"/>
+        </insert>
+        <insert tableName="event">
+            <column name="id" valueNumeric="3"/>
+            <column name="title" value="JavaLand 2026"/>
+            <column name="venue" value="Phantasialand"/>
+            <column name="city" value="Brühl"/>
+            <column name="starts_at" value="2026-09-22 09:00:00"/>
+            <column name="base_price" valueNumeric="499.00"/>
+            <column name="total_seats" valueNumeric="1200"/>
+            <column name="available_seats" valueNumeric="1150"/>
+            <column name="status" value="ON_SALE"/>
+            <column name="created_at" value="2026-08-02 14:00:00"/>
+        </insert>
+        <insert tableName="event">
+            <column name="id" valueNumeric="4"/>
+            <column name="title" value="El Clásico"/>
+            <column name="venue" value="Santiago Bernabéu"/>
+            <column name="city" value="Madrid"/>
+            <column name="starts_at" value="2026-10-25 21:00:00"/>
+            <column name="base_price" valueNumeric="250.00"/>
+            <column name="total_seats" valueNumeric="80000"/>
+            <column name="available_seats" valueNumeric="79995"/>
+            <column name="status" value="ON_SALE"/>
+            <column name="created_at" value="2026-08-05 10:00:00"/>
+        </insert>
+
+        <!-- 2. SUBCLASS INSERTS -->
+        <insert tableName="concert">
+            <column name="id" valueNumeric="1"/>
+            <column name="artist" value="The Midnight"/>
+            <column name="genre" value="Synthwave"/>
+            <column name="support_act" value="FM-84"/>
+        </insert>
+        <insert tableName="concert">
+            <column name="id" valueNumeric="2"/>
+            <column name="artist" value="Miles Davis Tribute Band"/>
+            <column name="genre" value="Jazz"/>
+            <column name="support_act" value="Local Trio"/>
+        </insert>
+
+        <insert tableName="conference">
+            <column name="id" valueNumeric="3"/>
+            <column name="topic" value="Java &amp; JVM Ecosystem"/>
+            <column name="speaker_count" valueNumeric="35"/>
+            <column name="has_workshops" valueBoolean="true"/>
+        </insert>
+
+        <insert tableName="sports_match">
+            <column name="id" valueNumeric="4"/>
+            <column name="home_team" value="Real Madrid"/>
+            <column name="away_team" value="FC Barcelona"/>
+            <column name="league" value="La Liga"/>
+        </insert>
+
+        <!-- 3. RESERVATION INSERTS -->
+        <insert tableName="reservation">
+            <column name="id" valueNumeric="1"/>
+            <column name="event_id" valueNumeric="1"/>
+            <column name="customer_email" value="alice@example.com"/>
+            <column name="seats" valueNumeric="2"/>
+            <column name="total_price" valueNumeric="240.00"/>
+            <column name="status" value="PENDING_PAYMENT"/>
+            <column name="hold_expires_at" value="2026-08-07 16:30:00"/>
+            <column name="created_at" value="2026-08-07 16:15:00"/>
+        </insert>
+        <insert tableName="reservation">
+            <column name="id" valueNumeric="2"/>
+            <column name="event_id" valueNumeric="1"/>
+            <column name="customer_email" value="bob@example.com"/>
+            <column name="seats" valueNumeric="4"/>
+            <column name="total_price" valueNumeric="480.00"/>
+            <column name="status" value="PENDING_PAYMENT"/>
+            <column name="hold_expires_at" value="2026-08-07 10:00:00"/>
+            <column name="created_at" value="2026-08-07 09:45:00"/>
+        </insert>
+
+        <!-- 4. POSTGRES SEQUENCE RESETS -->
+        <sql>
+            SELECT setval(pg_get_serial_sequence('event', 'id'), COALESCE(MAX(id), 1))
+            FROM event;
+            SELECT setval(pg_get_serial_sequence('reservation', 'id'), COALESCE(MAX(id), 1))
+            FROM reservation;
+        </sql>
+
+        <rollback>
+            <delete tableName="reservation"/>
+            <delete tableName="sports_match"/>
+            <delete tableName="conference"/>
+            <delete tableName="concert"/>
+            <delete tableName="event"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

@@ -7,3 +7,7 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: validate
+  liquibase:
+    change-log: classpath:db/changelog-master.xml
+    enabled: true
+    contexts: dev

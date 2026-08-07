@@ -4,5 +4,12 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                    https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
+    <include file="changelog/001-event-table-creation.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/002-conference-table-creation.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/003-concert-table-creation.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/004-sports-match-table-creation.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/005-reservation-table-creation.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/006-add-performance-indexes.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/007-seed-dev-data.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>
