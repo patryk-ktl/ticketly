@@ -1,0 +1,40 @@
+package io.github.patrykktl.ticketly.ticketingservice.exception.handling;
+
+import io.github.patrykktl.ticketly.ticketingservice.exception.InvalidStatusException;
+import io.github.patrykktl.ticketly.ticketingservice.exception.NoAvailableSeatsException;
+import io.github.patrykktl.ticketly.ticketingservice.exception.ReservationExpiredException;
+import jakarta.persistence.EntityNotFoundException;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ExceptionDTO handleEntityNotFoundException(EntityNotFoundException exception) {
+        return new ExceptionDTO(exception.getMessage());
+    }
+
+    @ExceptionHandler({
+            ReservationExpiredException.class,
+            NoAvailableSeatsException.class,
+            InvalidStatusException.class
+    })
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ExceptionDTO handleException(RuntimeException exception) {
+        return new ExceptionDTO(exception.getMessage());
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ValidationExceptionDTO handleMethodArgumentNotValidException(MethodArgumentNotValidException exception) {
+        ValidationExceptionDTO exceptionDTO = new ValidationExceptionDTO();
+        exception.getFieldErrors().forEach(error ->
+                exceptionDTO.addViolation(error.getField(), error.getDefaultMessage()));
+        return exceptionDTO;
+    }
+}
