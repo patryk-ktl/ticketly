@@ -54,7 +54,7 @@ public class ReservationService {
 
     // M11: payment happens here
     @Transactional
-    public void confirm(Integer reservationId) {
+    public ReservationDto confirm(Integer reservationId) {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new EntityNotFoundException("Reservation of given id cannot be found."));
 
@@ -63,5 +63,6 @@ public class ReservationService {
             throw new IllegalArgumentException("Reservation cannot be confirmed anymore.");
         }
         reservation.setStatus(ReservationStatus.CONFIRMED);
+        return ReservationMapper.mapToDto(reservation);
     }
 }

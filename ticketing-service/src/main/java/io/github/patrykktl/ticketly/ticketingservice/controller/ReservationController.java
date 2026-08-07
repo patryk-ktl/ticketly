@@ -6,6 +6,7 @@ import io.github.patrykktl.ticketly.ticketingservice.service.ReservationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,5 +24,10 @@ public class ReservationController {
     @ResponseStatus(HttpStatus.CREATED)
     public ReservationDto createReservation(@Valid @RequestBody CreateReservationCommand command) {
         return reservationService.createReservation(command);
+    }
+
+    @PostMapping("/{id}/confirm")
+    public ReservationDto confirm(@PathVariable Integer id) {
+        return reservationService.confirm(id);
     }
 }
