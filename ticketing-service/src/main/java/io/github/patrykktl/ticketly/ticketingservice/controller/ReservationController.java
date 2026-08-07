@@ -3,9 +3,11 @@ package io.github.patrykktl.ticketly.ticketingservice.controller;
 import io.github.patrykktl.ticketly.ticketingservice.model.command.CreateReservationCommand;
 import io.github.patrykktl.ticketly.ticketingservice.model.dto.ReservationDto;
 import io.github.patrykktl.ticketly.ticketingservice.service.ReservationService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,7 +21,7 @@ public class ReservationController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ReservationDto createReservation(CreateReservationCommand command) {
+    public ReservationDto createReservation(@Valid @RequestBody CreateReservationCommand command) {
         return reservationService.createReservation(command);
     }
 }
