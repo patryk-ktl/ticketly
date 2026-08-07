@@ -50,7 +50,7 @@ public class ReservationService {
                 .seats(seats)
                 .totalPrice(totalPrice)
                 .status(ReservationStatus.PENDING_PAYMENT)
-                .holdExpiresAt(LocalDateTime.now().minusMinutes(15))
+                .holdExpiresAt(LocalDateTime.now().plusMinutes(15))
                 .createdAt(LocalDateTime.now())
                 .build();
 
