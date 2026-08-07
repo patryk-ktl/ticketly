@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="002-conference-table-creation" author="patryk-ktl">
+        <createTable tableName="conference">
+            <column name="id" type="INTEGER" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"
+                             foreignKeyName="fk_conference_event"
+                             references="event(id)"
+                             deleteCascade="true"/>
+            </column>
+            <column name="topic" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="speaker_count" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="has_workshops" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <rollback>
+            <dropTable tableName="conference"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>
