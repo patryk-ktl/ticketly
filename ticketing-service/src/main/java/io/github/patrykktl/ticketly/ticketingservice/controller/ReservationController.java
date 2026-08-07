@@ -1,5 +1,6 @@
 package io.github.patrykktl.ticketly.ticketingservice.controller;
 
+import io.github.patrykktl.ticketly.ticketingservice.model.command.CreateReservationCommand;
 import io.github.patrykktl.ticketly.ticketingservice.model.dto.ReservationDto;
 import io.github.patrykktl.ticketly.ticketingservice.service.ReservationService;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +19,7 @@ public class ReservationController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ReservationDto createReservation(Integer eventId, String customerEmail, Integer seats) {
-        return reservationService.createReservation(eventId, customerEmail, seats);
+    public ReservationDto createReservation(CreateReservationCommand command) {
+        return reservationService.createReservation(command);
     }
 }

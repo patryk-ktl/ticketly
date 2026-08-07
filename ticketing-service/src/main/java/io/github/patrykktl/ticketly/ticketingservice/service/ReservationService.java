@@ -5,6 +5,7 @@ import io.github.patrykktl.ticketly.ticketingservice.model.Event;
 import io.github.patrykktl.ticketly.ticketingservice.model.EventStatus;
 import io.github.patrykktl.ticketly.ticketingservice.model.Reservation;
 import io.github.patrykktl.ticketly.ticketingservice.model.ReservationStatus;
+import io.github.patrykktl.ticketly.ticketingservice.model.command.CreateReservationCommand;
 import io.github.patrykktl.ticketly.ticketingservice.model.dto.ReservationDto;
 import io.github.patrykktl.ticketly.ticketingservice.repository.EventRepository;
 import io.github.patrykktl.ticketly.ticketingservice.repository.ReservationRepository;
@@ -24,10 +25,11 @@ public class ReservationService {
     private final EventRepository eventRepository;
 
     @Transactional
-    public ReservationDto createReservation(Integer eventId, String customerEmail, Integer seats) {
-        Event event = eventRepository.findById(eventId)
-                .orElseThrow(EntityNotFoundException::new);
+    public ReservationDto createReservation(CreateReservationCommand command) {
+        Event event = eventRepository.findById(command.getEventId())
+                .orElseThrow(() -> new EntityNotFoundException("Event of given id cannot be found"));
         Integer availableSeats = event.getAvailableSeats();
+        Integer seats = command.getSeats();
 
         if (!event.getStatus().equals(EventStatus.ON_SALE) ||
                 availableSeats < seats) {
@@ -39,7 +41,7 @@ public class ReservationService {
 
         Reservation reservation = Reservation.builder()
                 .event(event)
-                .customerEmail(customerEmail)
+                .customerEmail(command.getCustomerEmail())
                 .seats(seats)
                 .totalPrice(totalPrice)
                 .status(ReservationStatus.PENDING_PAYMENT)
@@ -48,5 +50,18 @@ public class ReservationService {
                 .build();
 
         return ReservationMapper.mapToDto(reservationRepository.save(reservation));
+    }
+
+    // M11: payment happens here
+    @Transactional
+    public void confirm(Integer reservationId) {
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new EntityNotFoundException("Reservation of given id cannot be found."));
+
+        if (!reservation.getStatus().equals(ReservationStatus.PENDING_PAYMENT) ||
+                !reservation.getHoldExpiresAt().isAfter(LocalDateTime.now())) {
+            throw new IllegalArgumentException("Reservation cannot be confirmed anymore.");
+        }
+        reservation.setStatus(ReservationStatus.CONFIRMED);
     }
 }
