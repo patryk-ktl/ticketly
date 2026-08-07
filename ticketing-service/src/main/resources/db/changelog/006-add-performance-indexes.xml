@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="006-add-performance-indexes" author="patryk-ktl">
+        <comment>cleanup job: Optimizes scheduled expiration query WHERE status = 'PENDING_PAYMENT' AND hold_expires_at
+            &lt; now()
+        </comment>
+        <createIndex indexName="idx_reservation_status_hold_expires" tableName="reservation">
+            <column name="status"/>
+            <column name="hold_expires_at"/>
+        </createIndex>
+
+        <comment>search optimization: Accelerates filtering and ordering by location and schedule WHERE city = ? AND
+            starts_at &gt; ?
+        </comment>
+        <createIndex indexName="idx_event_city_starts_at" tableName="event">
+            <column name="city"/>
+            <column name="starts_at"/>
+        </createIndex>
+
+        <rollback>
+            <dropIndex indexName="idx_reservation_status_hold_expires" tableName="reservation"/>
+            <dropIndex indexName="idx_event_city_starts_at" tableName="event"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>
