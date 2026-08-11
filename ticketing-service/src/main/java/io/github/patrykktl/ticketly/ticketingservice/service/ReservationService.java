@@ -14,9 +14,6 @@ import io.github.patrykktl.ticketly.ticketingservice.repository.EventRepository;
 import io.github.patrykktl.ticketly.ticketingservice.repository.ReservationRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.OptimisticLockingFailureException;
-import org.springframework.retry.annotation.Retryable;
-import org.springframework.retry.annotation.Backoff;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,14 +27,9 @@ public class ReservationService {
     private final ReservationRepository reservationRepository;
     private final EventRepository eventRepository;
 
-    @Retryable(
-            retryFor = {OptimisticLockingFailureException.class},
-            maxAttempts = 3,
-            backoff = @Backoff(delay = 50)
-    )
     @Transactional
     public ReservationDto createReservation(CreateReservationCommand command) {
-        Event event = eventRepository.findById(command.getEventId())
+        Event event = eventRepository.findWithLockingById(command.getEventId())
                 .orElseThrow(() -> new EntityNotFoundException("Event of given id cannot be found."));
         Integer availableSeats = event.getAvailableSeats();
         Integer seats = command.getSeats();
