@@ -4,6 +4,7 @@ import io.github.patrykktl.ticketly.ticketingservice.exception.InvalidStatusExce
 import io.github.patrykktl.ticketly.ticketingservice.exception.NoAvailableSeatsException;
 import io.github.patrykktl.ticketly.ticketingservice.exception.ReservationExpiredException;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -27,6 +28,12 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.CONFLICT)
     public ExceptionDTO handleException(RuntimeException exception) {
         return new ExceptionDTO(exception.getMessage());
+    }
+
+    @ExceptionHandler(OptimisticLockingFailureException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ExceptionDTO handleOptimisticLockingFailureException() {
+        return new ExceptionDTO("The resource was updated by another request. Please try again.");
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

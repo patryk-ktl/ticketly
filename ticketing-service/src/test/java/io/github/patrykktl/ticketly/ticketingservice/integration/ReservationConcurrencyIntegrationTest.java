@@ -1,5 +1,6 @@
 package io.github.patrykktl.ticketly.ticketingservice.integration;
 
+import io.github.patrykktl.ticketly.ticketingservice.exception.NoAvailableSeatsException;
 import io.github.patrykktl.ticketly.ticketingservice.model.Concert;
 import io.github.patrykktl.ticketly.ticketingservice.model.Event;
 import io.github.patrykktl.ticketly.ticketingservice.model.EventStatus;
@@ -20,6 +21,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -67,14 +69,22 @@ class ReservationConcurrencyIntegrationTest {
             CountDownLatch startLatch = new CountDownLatch(1);
             CountDownLatch finishLatch = new CountDownLatch(numberOfThreads);
 
+            AtomicInteger successCount = new AtomicInteger();
+            AtomicInteger noSeatsExceptionCount = new AtomicInteger();
+
             Runnable task = () -> {
                 try {
                     startLatch.await();
                     reservationService.createReservation(
                             new CreateReservationCommand(testEventId, "ex@example.com", 1)
                     );
-                } catch (Exception ignored) {
-                    //expected failure for loser thread once locked
+                    successCount.incrementAndGet();
+                } catch (NoAvailableSeatsException e) {
+                    noSeatsExceptionCount.incrementAndGet();
+                } catch (Exception e) {
+                    if (e.getCause() instanceof NoAvailableSeatsException) {
+                        noSeatsExceptionCount.incrementAndGet();
+                    }
                 } finally {
                     finishLatch.countDown();
                 }
@@ -90,8 +100,12 @@ class ReservationConcurrencyIntegrationTest {
             Event updatedEvent = eventRepository.findById(testEventId).orElseThrow();
             long totalReservations = reservationRepository.countByEventId(testEventId);
 
+            assertThat(successCount.get()).isEqualTo(1);
+            assertThat(noSeatsExceptionCount.get()).isEqualTo(1);
+
             assertThat(totalReservations).isEqualTo(1);
             assertThat(updatedEvent.getAvailableSeats()).isZero();
+            assertThat(updatedEvent.getVersion()).isEqualTo(1L);
 
         } catch (Exception ignored) {
             //ignored
