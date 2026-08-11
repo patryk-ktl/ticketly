@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Version;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -48,4 +49,7 @@ public abstract class Event {
 
     @OneToMany(mappedBy = "event")
     private final List<Reservation> reservations = new ArrayList<>();
+
+    @Version
+    private Long version;
 }

@@ -29,7 +29,7 @@ public class ReservationService {
 
     @Transactional
     public ReservationDto createReservation(CreateReservationCommand command) {
-        Event event = eventRepository.findById(command.getEventId())
+        Event event = eventRepository.findWithLockingById(command.getEventId())
                 .orElseThrow(() -> new EntityNotFoundException("Event of given id cannot be found."));
         Integer availableSeats = event.getAvailableSeats();
         Integer seats = command.getSeats();

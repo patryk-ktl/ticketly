@@ -4,4 +4,7 @@ import io.github.patrykktl.ticketly.ticketingservice.model.Reservation;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Integer> {
+    void deleteByEventId(Integer eventId);
+
+    long countByEventId(Integer eventId);
 }
