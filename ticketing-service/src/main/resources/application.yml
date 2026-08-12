@@ -1,21 +1,12 @@
 spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/ticketly
-    username: ticketly
-    password: ticketly
   jpa:
-    show-sql: true
     hibernate:
       ddl-auto: validate
-    properties:
-      hibernate:
-        format_sql: true
-        highlight-sql: true
   liquibase:
     change-log: classpath:db/changelog-master.xml
     enabled: true
-    contexts: dev
-logging:
-  level:
-    org.hibernate.sql: DEBUG
-    org.hibernate.orm.jdbc.bind: TRACE
+ticketly:
+  max-seats-per-reservation: 10
+  seat-hold-minutes: 15
+  service-fee-percent: 10.0
+  hold-cleanup-cron: '* * * * *'
