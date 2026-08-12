@@ -1,5 +1,6 @@
 package io.github.patrykktl.ticketly.ticketingservice.controller;
 
+import io.github.patrykktl.ticketly.ticketingservice.model.command.EventSearchCriteria;
 import io.github.patrykktl.ticketly.ticketingservice.model.dto.EventCardDto;
 import io.github.patrykktl.ticketly.ticketingservice.service.EventService;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +18,7 @@ public class EventController {
     private final EventService eventService;
 
     @GetMapping
-    public Page<EventCardDto> findAll(Pageable pageable) {
-        return eventService.findAll(pageable);
+    public Page<EventCardDto> searchEvents(EventSearchCriteria criteria, Pageable pageable) {
+        return eventService.searchEvents(criteria, pageable);
     }
 }
