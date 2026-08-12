@@ -5,3 +5,8 @@ spring:
   liquibase:
     change-log: classpath:db/changelog-master.xml
     enabled: true
+ticketly:
+  max-seats-per-reservation: 10
+  seat-hold-minutes: 15
+  service-fee-percent: 10.0
+  hold-cleanup-cron: '* * * * *'
