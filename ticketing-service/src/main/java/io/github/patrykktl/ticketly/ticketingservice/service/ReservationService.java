@@ -33,22 +33,24 @@ public class ReservationService {
     @Transactional
     public ReservationDto createReservation(CreateReservationCommand command) {
         Event event = eventRepository.findWithLockingById(command.getEventId())
-                .orElseThrow(() -> new EntityNotFoundException("Event of given id cannot be found."));
+                .orElseThrow(() -> new EntityNotFoundException("Event of given id cannot be found"));
         Integer availableSeats = event.getAvailableSeats();
         Integer seats = command.getSeats();
 
         if (!event.getStatus().equals(EventStatus.ON_SALE)) {
-            throw new InvalidStatusException("Reservations for the selected event are not on sale.");
+            throw new InvalidStatusException("Reservations for the selected event are not on sale");
         }
         if (availableSeats < seats) {
-            throw new NoAvailableSeatsException("There are no seats available for the selected event");
+            throw new NoAvailableSeatsException("There are not enough seats available for the selected event");
         }
         if (command.getSeats() > properties.getMaxSeatsPerReservation()) {
-            throw new SeatLimitReachedException("You have exceeded the seat limit per reservation.");
+            throw new SeatLimitReachedException("You have exceeded the seat limit per reservation");
         }
 
         event.setAvailableSeats(availableSeats - seats);
-        BigDecimal totalPrice = event.getBasePrice().multiply(BigDecimal.valueOf(seats));
+        BigDecimal totalPrice = event.getBasePrice()
+                .multiply(BigDecimal.valueOf(seats))
+                .multiply(BigDecimal.valueOf(1).add(properties.getServiceFeePercent()));
 
         Reservation reservation = Reservation.builder()
                 .event(event)
