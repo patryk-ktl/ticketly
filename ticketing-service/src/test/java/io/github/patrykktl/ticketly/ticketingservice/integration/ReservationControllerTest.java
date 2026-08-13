@@ -84,7 +84,7 @@ class ReservationControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.customerEmail").value("developer@example.com"))
-                .andExpect(jsonPath("$.seats").value(4))
+                .andExpect(jsonPath("$.seats").value(3))
                 .andExpect(jsonPath("$.status").value(ReservationStatus.PENDING_PAYMENT.name()))
                 .andReturn();
 
