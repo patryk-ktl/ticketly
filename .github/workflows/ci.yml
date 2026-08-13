@@ -1,0 +1,27 @@
+name: Java CI with Maven
+
+on:
+  pull_request:
+    branches:
+      - main
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+          cache-dependency-path: 'ticketing-service/pom.xml'
+
+      - name: Build and run tests with Maven
+        working-directory: ticketing-service
+        run: mvn -B verify
