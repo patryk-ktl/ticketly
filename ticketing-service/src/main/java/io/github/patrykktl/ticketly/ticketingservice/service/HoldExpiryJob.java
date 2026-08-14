@@ -4,6 +4,7 @@ import io.github.patrykktl.ticketly.ticketingservice.repository.EventRepository;
 import io.github.patrykktl.ticketly.ticketingservice.repository.ReservationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +20,11 @@ public class HoldExpiryJob {
     private final EventRepository eventRepository;
 
     @Scheduled(cron = "${ticketly.hold-cleanup-cron}")
+    @SchedulerLock(
+            name = "releaseExpiredHolds",
+            lockAtLeastFor = "PT10S",
+            lockAtMostFor = "PT30S"
+    )
     @Transactional
     public void releaseExpiredHolds() {
         LocalDateTime now = LocalDateTime.now();
@@ -30,10 +36,14 @@ public class HoldExpiryJob {
             log.info("Hold expiry job completed: Expired {} reservations and restored {} seats to event inventory.",
                     reservationsExpired, seatsRestored);
         }
-        log.info("Hold expiry job was run.");
     }
 
     @Scheduled(cron = "${ticketly.finish-events-cron}")
+    @SchedulerLock(
+            name = "finishPastEvents",
+            lockAtLeastFor = "PT10S",
+            lockAtMostFor = "PT30S"
+    )
     @Transactional
     public void finishPastEvents() {
         LocalDateTime now = LocalDateTime.now();
@@ -44,6 +54,5 @@ public class HoldExpiryJob {
             log.info("Finish past events job completed: Finished {} events.",
                     eventsFinished);
         }
-        log.info("Finish past events job was run.");
     }
 }
