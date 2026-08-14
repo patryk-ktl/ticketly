@@ -54,7 +54,7 @@ class EventServiceTest {
 
         when(eventRepository.findBy(any(Specification.class), any(Function.class))).thenReturn(eventDtoPage);
 
-        Page<EventCardDto> result = eventService.searchEvents(null, pageable);
+        Page<EventCardDto> result = eventService.searchEvents(null, pageable).toPage(pageable);
 
         assertThat(result).hasSize(1);
         assertThat(result.getContent().get(0)).isEqualTo(dto);

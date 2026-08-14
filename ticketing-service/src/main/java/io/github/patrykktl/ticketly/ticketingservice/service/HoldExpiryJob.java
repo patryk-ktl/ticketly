@@ -5,6 +5,8 @@ import io.github.patrykktl.ticketly.ticketingservice.repository.ReservationRepos
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +28,10 @@ public class HoldExpiryJob {
             lockAtMostFor = "PT30S"
     )
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "eventDetails", allEntries = true),
+            @CacheEvict(value = "eventSearchResults", allEntries = true)
+    })
     public void releaseExpiredHolds() {
         LocalDateTime now = LocalDateTime.now();
 
@@ -45,6 +51,10 @@ public class HoldExpiryJob {
             lockAtMostFor = "PT30S"
     )
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "eventDetails", allEntries = true),
+            @CacheEvict(value = "eventSearchResults", allEntries = true)
+    })
     public void finishPastEvents() {
         LocalDateTime now = LocalDateTime.now();
 

@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,6 +20,11 @@ public class EventController {
 
     @GetMapping
     public Page<EventCardDto> searchEvents(EventSearchCriteria criteria, Pageable pageable) {
-        return eventService.searchEvents(criteria, pageable);
+        return eventService.searchEvents(criteria, pageable).toPage(pageable);
+    }
+
+    @GetMapping("/{id}")
+    public EventCardDto getEventDetails(@PathVariable Integer id) {
+        return eventService.getEventDetails(id);
     }
 }

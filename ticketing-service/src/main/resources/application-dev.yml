@@ -11,7 +11,14 @@ spring:
         highlight-sql: true
   liquibase:
     contexts: dev
+  cache:
+    type: simple
+  data:
+    redis:
+      host: localhost
+      port: 6379
 logging:
   level:
     org.hibernate.sql: DEBUG
     org.hibernate.orm.jdbc.bind: TRACE
+    org.springframework.cache: TRACE
