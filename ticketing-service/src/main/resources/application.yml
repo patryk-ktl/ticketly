@@ -5,6 +5,8 @@ spring:
   liquibase:
     change-log: classpath:db/changelog-master.xml
     enabled: true
+  cache:
+    type: redis
 ticketly:
   max-seats-per-reservation: 10
   seat-hold-minutes: 15

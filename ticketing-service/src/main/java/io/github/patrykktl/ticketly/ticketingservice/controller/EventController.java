@@ -20,7 +20,7 @@ public class EventController {
 
     @GetMapping
     public Page<EventCardDto> searchEvents(EventSearchCriteria criteria, Pageable pageable) {
-        return eventService.searchEvents(criteria, pageable);
+        return eventService.searchEvents(criteria, pageable).toPage(pageable);
     }
 
     @GetMapping("/{id}")

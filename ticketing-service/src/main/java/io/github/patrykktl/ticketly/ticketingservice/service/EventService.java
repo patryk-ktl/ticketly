@@ -1,5 +1,6 @@
 package io.github.patrykktl.ticketly.ticketingservice.service;
 
+import io.github.patrykktl.ticketly.ticketingservice.model.CachedPage;
 import io.github.patrykktl.ticketly.ticketingservice.model.Event;
 import io.github.patrykktl.ticketly.ticketingservice.model.command.EventSearchCriteria;
 import io.github.patrykktl.ticketly.ticketingservice.model.dto.EventCardDto;
@@ -20,11 +21,12 @@ public class EventService {
     private final EventRepository eventRepository;
 
     @Cacheable(value = "eventSearchResults", keyGenerator = "searchKeyGenerator")
-    public Page<EventCardDto> searchEvents(EventSearchCriteria criteria, Pageable pageable) {
+    public CachedPage<EventCardDto> searchEvents(EventSearchCriteria criteria, Pageable pageable) {
         Specification<Event> spec = EventSpecifications.buildSpecification(criteria);
-        return eventRepository.findBy(
+        Page<EventCardDto> page = eventRepository.findBy(
                 spec,
                 q -> q.as(EventCardDto.class).page(pageable));
+        return CachedPage.from(page);
     }
 
     @Cacheable(value = "eventDetails", key = "#id")
