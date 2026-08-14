@@ -1,0 +1,61 @@
+services:
+  # ==========================================
+  # Infrastructure Services (Shared across repo
+  # ==========================================
+  db:
+    image: postgres:16
+    container_name: db-ticketly
+    environment:
+      POSTGRES_DB: ticketly
+      POSTGRES_USER: ticketly
+      POSTGRES_PASSWORD: ticketly
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ticketly -d ticketly"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+
+  redis:
+    image: redis:7
+    container_name: redis-ticketly
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+
+  # ==========================================
+  # Microservices
+  # ==========================================
+  ticketing-service:
+    build:
+      context: ./ticketing-service       
+      dockerfile: Dockerfile             
+    container_name: ticketing-service
+    ports:
+      - "8081:8081"
+    environment:
+      - SERVER_PORT=8081
+      - SPRING_PROFILES_ACTIVE=prod
+      - DB_URL=jdbc:postgresql://db:5432/ticketly
+      - DB_USERNAME=ticketly
+      - DB_PASSWORD=ticketly
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+        
+volumes:
+  postgres_data:
+    driver: local
