@@ -10,6 +10,10 @@ spring:
         format_sql: false
   liquibase:
     contexts: prod
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
 management:
   endpoints:
     web:
