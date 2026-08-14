@@ -1,6 +1,7 @@
 package io.github.patrykktl.ticketly.ticketingservice.repository;
 
 import io.github.patrykktl.ticketly.ticketingservice.model.Event;
+import io.github.patrykktl.ticketly.ticketingservice.model.dto.EventCardDto;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -16,6 +17,9 @@ public interface EventRepository extends JpaRepository<Event, Integer>, JpaSpeci
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     Optional<Event> findWithLockingById(Integer id);
+
+    @Query("SELECT e FROM Event e WHERE e.id = :id")
+    Optional<EventCardDto> findEventDetails(@Param("id") Integer id);
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("""
