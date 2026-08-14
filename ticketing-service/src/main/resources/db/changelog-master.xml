@@ -12,5 +12,6 @@
     <include file="changelog/006-add-performance-indexes.xml" relativeToChangelogFile="true"/>
     <include file="changelog/007-seed-dev-data.xml" relativeToChangelogFile="true"/>
     <include file="changelog/008-event-add-version-field.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/009-schedlock-table-creation.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>
