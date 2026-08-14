@@ -11,5 +11,5 @@ ticketly:
   max-seats-per-reservation: ${MAX_SEATS_PER_RESERVATION:10}
   seat-hold-minutes: ${SEAT_HOLD_MINUTES:15}
   service-fee-percent: ${SERVICE_FEE_PERCENT:0.1}
-  hold-cleanup-cron: ${HOLD_CLEANUP_CRON:'0 * * * * *'}
-  finish-events-cron: ${FINISH_EVENTS_CRON:'0 0 * * * *'}
+  hold-cleanup-cron: ${HOLD_CLEANUP_CRON:0 * * * * *}
+  finish-events-cron: ${FINISH_EVENTS_CRON:0 0 * * * *}
