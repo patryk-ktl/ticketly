@@ -15,10 +15,10 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("""
-                    UPDATE Reservation r
-                    SET r.status = 'EXPIRED'
-                    WHERE r.status = 'PENDING_PAYMENT'
-                      AND r.holdExpiresAt < :now
+                 UPDATE Reservation r
+                 SET r.status = 'EXPIRED'
+                 WHERE r.status = 'PENDING_PAYMENT'
+                   AND r.holdExpiresAt < :now
             """)
     int expirePendingHolds(@Param("now") LocalDateTime now);
 }

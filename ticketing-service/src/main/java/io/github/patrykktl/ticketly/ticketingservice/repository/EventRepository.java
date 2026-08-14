@@ -36,4 +36,13 @@ public interface EventRepository extends JpaRepository<Event, Integer>, JpaSpeci
                 )
             """)
     int restoreSeatsWithExpiredReservations(@Param("now") LocalDateTime now);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("""
+                UPDATE Event e
+                SET e.status = 'FINISHED'
+                WHERE e.startsAt < :now
+                 AND e.status = 'ON_SALE'
+            """)
+    int finishPastEvents(@Param("now") LocalDateTime now);
 }

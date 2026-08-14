@@ -27,4 +27,7 @@ public class TicketlyProperties {
 
     @NotBlank(message = "Hold cleanup cron expression must not be blank")
     String holdCleanupCron;
+
+    @NotBlank(message = "Finish events cron expression must not be blank")
+    String finishEventsCron;
 }

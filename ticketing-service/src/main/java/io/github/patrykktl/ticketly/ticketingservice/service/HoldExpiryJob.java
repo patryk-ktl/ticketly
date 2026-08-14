@@ -32,4 +32,18 @@ public class HoldExpiryJob {
         }
         log.info("Hold expiry job was run.");
     }
+
+    @Scheduled(cron = "${ticketly.finish-events-cron}")
+    @Transactional
+    public void finishPastEvents() {
+        LocalDateTime now = LocalDateTime.now();
+
+        int eventsFinished = eventRepository.finishPastEvents(now);
+
+        if (eventsFinished > 0) {
+            log.info("Finish past events job completed: Finished {} events.",
+                    eventsFinished);
+        }
+        log.info("Finish past events job was run.");
+    }
 }
