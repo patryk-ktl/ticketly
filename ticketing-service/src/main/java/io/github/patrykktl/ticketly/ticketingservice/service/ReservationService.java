@@ -16,6 +16,8 @@ import io.github.patrykktl.ticketly.ticketingservice.repository.EventRepository;
 import io.github.patrykktl.ticketly.ticketingservice.repository.ReservationRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +33,10 @@ public class ReservationService {
     private final TicketlyProperties properties;
 
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "eventDetails", key = "#command.eventId"),
+            @CacheEvict(value = "eventSearchResults", allEntries = true)
+    })
     public ReservationDto createReservation(CreateReservationCommand command) {
         Event event = eventRepository.findWithLockingById(command.getEventId())
                 .orElseThrow(() -> new EntityNotFoundException("Event of given id cannot be found"));
