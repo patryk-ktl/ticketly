@@ -2,6 +2,7 @@ package io.github.patrykktl.ticketly.ticketingservice.config;
 
 import io.github.patrykktl.ticketly.ticketingservice.model.CachedPage;
 import io.github.patrykktl.ticketly.ticketingservice.model.dto.EventCardDto;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
@@ -23,6 +24,7 @@ import java.util.Map;
 public class RedisCacheConfig {
 
     @Bean
+    @ConditionalOnProperty(prefix = "spring.cache", name = "type", havingValue = "redis")
     public RedisCacheManager cacheManager(RedisConnectionFactory connectionFactory) {
         ObjectMapper mapper = JsonMapper.builder()
                 .findAndAddModules()
