@@ -7,6 +7,15 @@ spring:
     enabled: true
   cache:
     type: redis
+  cloud:
+    openfeign:
+      client:
+        config:
+          payment-service:
+            url: ${PAYMENT_SERVICE_URL:http://localhost:8082}
+            connect-timeout: 2000
+            read-timeout: 5000
+            logger-level: full
 ticketly:
   max-seats-per-reservation: ${MAX_SEATS_PER_RESERVATION:10}
   seat-hold-minutes: ${SEAT_HOLD_MINUTES:15}
