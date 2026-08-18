@@ -1,12 +1,16 @@
 package io.github.patrykktl.ticketly.ticketingservice.unit;
 
+import io.github.patrykktl.ticketly.ticketingservice.client.PaymentClient;
+import io.github.patrykktl.ticketly.ticketingservice.exception.InterruptedPaymentException;
 import io.github.patrykktl.ticketly.ticketingservice.exception.InvalidStatusException;
 import io.github.patrykktl.ticketly.ticketingservice.exception.NoAvailableSeatsException;
-import io.github.patrykktl.ticketly.ticketingservice.exception.ReservationExpiredException;
 import io.github.patrykktl.ticketly.ticketingservice.exception.SeatLimitReachedException;
 import io.github.patrykktl.ticketly.ticketingservice.model.Concert;
 import io.github.patrykktl.ticketly.ticketingservice.model.Event;
 import io.github.patrykktl.ticketly.ticketingservice.model.EventStatus;
+import io.github.patrykktl.ticketly.ticketingservice.model.PaymentRequest;
+import io.github.patrykktl.ticketly.ticketingservice.model.PaymentResponse;
+import io.github.patrykktl.ticketly.ticketingservice.model.PaymentStatus;
 import io.github.patrykktl.ticketly.ticketingservice.model.Reservation;
 import io.github.patrykktl.ticketly.ticketingservice.model.ReservationStatus;
 import io.github.patrykktl.ticketly.ticketingservice.model.command.CreateReservationCommand;
@@ -15,6 +19,7 @@ import io.github.patrykktl.ticketly.ticketingservice.properties.TicketlyProperti
 import io.github.patrykktl.ticketly.ticketingservice.repository.EventRepository;
 import io.github.patrykktl.ticketly.ticketingservice.repository.ReservationRepository;
 import io.github.patrykktl.ticketly.ticketingservice.service.ReservationService;
+import io.github.patrykktl.ticketly.ticketingservice.service.ReservationTxHelper;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -49,6 +54,12 @@ class ReservationServiceTest {
 
     @Mock
     private TicketlyProperties properties;
+
+    @Mock
+    private PaymentClient paymentClient;
+
+    @Mock
+    private ReservationTxHelper txHelper;
 
     private Event defaultEvent;
 
@@ -175,42 +186,53 @@ class ReservationServiceTest {
     }
 
     @Test
-    void testConfirm_shouldConfirmReservation() {
-        when(reservationRepository.findById(10)).thenReturn(Optional.of(defaultReservation));
+    void testConfirm_shouldOrchestrateSuccessfulConfirmation() {
+        PaymentResponse paymentResponse = new PaymentResponse(
+                100,
+                PaymentStatus.SUCCEEDED,
+                "8082"
+        );
+        ReservationDto expectedDto = ReservationDto.builder()
+                .id(10)
+                .status(ReservationStatus.CONFIRMED)
+                .build();
+
+        when(txHelper.getAndValidateForConfirmation(10)).thenReturn(defaultReservation);
+        when(paymentClient.charge(any(PaymentRequest.class))).thenReturn(paymentResponse);
+        when(txHelper.recordPaymentOutcome(10, paymentResponse)).thenReturn(expectedDto);
 
         ReservationDto result = reservationService.confirm(10);
 
         assertThat(result).isNotNull();
         assertThat(result.getStatus()).isEqualTo(ReservationStatus.CONFIRMED);
-        verify(reservationRepository).findById(10);
+
+        ArgumentCaptor<PaymentRequest> captor = ArgumentCaptor.forClass(PaymentRequest.class);
+        verify(paymentClient).charge(captor.capture());
+        assertThat(captor.getValue().reservationId()).isEqualTo(10);
+
+        verify(txHelper).getAndValidateForConfirmation(10);
+        verify(txHelper).recordPaymentOutcome(10, paymentResponse);
     }
 
     @Test
-    void testConfirm_shouldThrowEntityNotFoundException() {
-        when(reservationRepository.findById(11)).thenReturn(Optional.empty());
+    void testConfirm_shouldPropagateExceptionWhenPaymentFails() {
+        PaymentResponse failedResponse = new PaymentResponse(
+                100,
+                PaymentStatus.FAILED,
+                "8082"
+        );
 
-        assertThatThrownBy(() -> reservationService.confirm(11))
-                .isInstanceOf(EntityNotFoundException.class)
-                .hasMessage("Reservation of given id cannot be found.");
-    }
-
-    @Test
-    void testConfirm_shouldThrowInvalidStatusException() {
-        defaultReservation.setStatus(ReservationStatus.CANCELLED);
-        when(reservationRepository.findById(10)).thenReturn(Optional.of(defaultReservation));
+        when(txHelper.getAndValidateForConfirmation(10)).thenReturn(defaultReservation);
+        when(paymentClient.charge(any(PaymentRequest.class))).thenReturn(failedResponse);
+        when(txHelper.recordPaymentOutcome(10, failedResponse))
+                .thenThrow(new InterruptedPaymentException("Payment declined, your hold remains until 18:00"));
 
         assertThatThrownBy(() -> reservationService.confirm(10))
-                .isInstanceOf(InvalidStatusException.class)
-                .hasMessage("Reservation cannot be confirmed.");
-    }
+                .isInstanceOf(InterruptedPaymentException.class)
+                .hasMessageContaining("Payment declined");
 
-    @Test
-    void testConfirm_shouldThrowReservationExpiredException() {
-        defaultReservation.setHoldExpiresAt(LocalDateTime.now().minusDays(1));
-        when(reservationRepository.findById(10)).thenReturn(Optional.of(defaultReservation));
-
-        assertThatThrownBy(() -> reservationService.confirm(10))
-                .isInstanceOf(ReservationExpiredException.class)
-                .hasMessage("Reservation has already expired.");
+        verify(txHelper).getAndValidateForConfirmation(10);
+        verify(paymentClient).charge(any(PaymentRequest.class));
+        verify(txHelper).recordPaymentOutcome(10, failedResponse);
     }
 }
