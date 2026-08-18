@@ -13,3 +13,10 @@ ticketly:
   service-fee-percent: ${SERVICE_FEE_PERCENT:0.1}
   hold-cleanup-cron: ${HOLD_CLEANUP_CRON:0 * * * * *}
   finish-events-cron: ${FINISH_EVENTS_CRON:0 0 * * * *}
+eureka:
+  instance:
+    instance-id: ticketing-service:${random.value}
+    prefer-ip-address: true
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka/}
