@@ -20,8 +20,7 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           cache: maven
-          cache-dependency-path: 'ticketing-service/pom.xml'
+          cache-dependency-path: '**/pom.xml'
 
       - name: Build and run tests with Maven
-        working-directory: ticketing-service
         run: mvn -B verify
