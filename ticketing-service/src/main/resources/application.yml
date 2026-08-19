@@ -12,7 +12,6 @@ spring:
       client:
         config:
           payment-service:
-            url: ${PAYMENT_SERVICE_URL:http://localhost:8082}
             connect-timeout: 2000
             read-timeout: 5000
             logger-level: full
