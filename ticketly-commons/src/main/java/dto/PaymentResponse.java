@@ -1,4 +1,4 @@
-package io.github.patrykktl.ticketly.paymentservice.model;
+package dto;
 
 import lombok.Builder;
 

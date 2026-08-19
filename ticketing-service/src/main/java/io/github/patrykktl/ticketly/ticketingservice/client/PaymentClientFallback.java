@@ -1,8 +1,8 @@
 package io.github.patrykktl.ticketly.ticketingservice.client;
 
+import dto.PaymentRequest;
+import dto.PaymentResponse;
 import io.github.patrykktl.ticketly.ticketingservice.exception.PaymentServiceUnavailableException;
-import io.github.patrykktl.ticketly.ticketingservice.model.PaymentRequest;
-import io.github.patrykktl.ticketly.ticketingservice.model.PaymentResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

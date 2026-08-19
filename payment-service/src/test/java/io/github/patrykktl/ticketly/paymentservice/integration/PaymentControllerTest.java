@@ -1,9 +1,9 @@
 package io.github.patrykktl.ticketly.paymentservice.integration;
 
+import dto.PaymentRequest;
+import dto.PaymentResponse;
+import dto.PaymentStatus;
 import io.github.patrykktl.ticketly.paymentservice.controller.PaymentController;
-import io.github.patrykktl.ticketly.paymentservice.model.PaymentRequest;
-import io.github.patrykktl.ticketly.paymentservice.model.PaymentResponse;
-import io.github.patrykktl.ticketly.paymentservice.model.PaymentStatus;
 import io.github.patrykktl.ticketly.paymentservice.service.PaymentService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

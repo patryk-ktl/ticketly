@@ -1,5 +1,7 @@
 package io.github.patrykktl.ticketly.ticketingservice.service;
 
+import dto.PaymentRequest;
+import dto.PaymentResponse;
 import io.github.patrykktl.ticketly.ticketingservice.client.PaymentClient;
 import io.github.patrykktl.ticketly.ticketingservice.exception.InvalidStatusException;
 import io.github.patrykktl.ticketly.ticketingservice.exception.NoAvailableSeatsException;
@@ -7,8 +9,6 @@ import io.github.patrykktl.ticketly.ticketingservice.exception.SeatLimitReachedE
 import io.github.patrykktl.ticketly.ticketingservice.mapper.ReservationMapper;
 import io.github.patrykktl.ticketly.ticketingservice.model.Event;
 import io.github.patrykktl.ticketly.ticketingservice.model.EventStatus;
-import io.github.patrykktl.ticketly.ticketingservice.model.PaymentRequest;
-import io.github.patrykktl.ticketly.ticketingservice.model.PaymentResponse;
 import io.github.patrykktl.ticketly.ticketingservice.model.Reservation;
 import io.github.patrykktl.ticketly.ticketingservice.model.ReservationStatus;
 import io.github.patrykktl.ticketly.ticketingservice.model.command.CreateReservationCommand;

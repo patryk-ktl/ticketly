@@ -1,6 +1,8 @@
 package io.github.patrykktl.ticketly.ticketingservice.exception.handling;
 
-import io.github.patrykktl.ticketly.ticketingservice.exception.InterruptedPaymentException;
+import exception.ExceptionDTO;
+import exception.InterruptedPaymentException;
+import exception.ValidationExceptionDTO;
 import io.github.patrykktl.ticketly.ticketingservice.exception.InvalidStatusException;
 import io.github.patrykktl.ticketly.ticketingservice.exception.NoAvailableSeatsException;
 import io.github.patrykktl.ticketly.ticketingservice.exception.PaymentServiceUnavailableException;

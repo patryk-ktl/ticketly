@@ -1,11 +1,11 @@
 package io.github.patrykktl.ticketly.ticketingservice.service;
 
-import io.github.patrykktl.ticketly.ticketingservice.exception.InterruptedPaymentException;
+import dto.PaymentResponse;
+import dto.PaymentStatus;
+import exception.InterruptedPaymentException;
 import io.github.patrykktl.ticketly.ticketingservice.exception.InvalidStatusException;
 import io.github.patrykktl.ticketly.ticketingservice.exception.ReservationExpiredException;
 import io.github.patrykktl.ticketly.ticketingservice.mapper.ReservationMapper;
-import io.github.patrykktl.ticketly.ticketingservice.model.PaymentResponse;
-import io.github.patrykktl.ticketly.ticketingservice.model.PaymentStatus;
 import io.github.patrykktl.ticketly.ticketingservice.model.Reservation;
 import io.github.patrykktl.ticketly.ticketingservice.model.ReservationStatus;
 import io.github.patrykktl.ticketly.ticketingservice.model.dto.ReservationDto;

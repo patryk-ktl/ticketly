@@ -1,4 +1,4 @@
-package io.github.patrykktl.ticketly.paymentservice.exception;
+package exception;
 
 public class InterruptedPaymentException extends RuntimeException {
 

@@ -1,4 +1,4 @@
-package io.github.patrykktl.ticketly.paymentservice.model;
+package dto;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
