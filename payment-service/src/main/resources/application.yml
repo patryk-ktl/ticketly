@@ -5,6 +5,8 @@ spring:
   liquibase:
     change-log: classpath:db/changelog-master.xml
     enabled: true
+  application:
+    name: payment-service
 eureka:
   instance:
     instance-id: payment-service:${random.value}

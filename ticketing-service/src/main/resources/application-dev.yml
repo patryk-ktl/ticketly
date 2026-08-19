@@ -22,3 +22,6 @@ logging:
     org.hibernate.sql: DEBUG
     org.hibernate.orm.jdbc.bind: TRACE
     org.springframework.cache: TRACE
+
+server:
+  port: 8081

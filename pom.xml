@@ -38,7 +38,7 @@
         <module>ticketing-service</module>
         <module>payment-service</module>
         <module>eureka-server</module>
-        <!--        <module>gateway</module>-->
+        <module>gateway</module>
     </modules>
 
     <dependencyManagement>

@@ -18,6 +18,8 @@ spring:
             logger-level: full
       circuitbreaker:
         enabled: true
+  application:
+    name: ticketing-service
 resilience4j:
   circuitbreaker:
     instances:
