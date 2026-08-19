@@ -44,7 +44,7 @@ class PaymentControllerTest {
 
         when(paymentService.processPayment(any(PaymentRequest.class))).thenReturn(response);
 
-        mockMvc.perform(post("/payments")
+        mockMvc.perform(post("/api/payments")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())

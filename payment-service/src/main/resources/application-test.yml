@@ -8,3 +8,6 @@ spring:
     database-platform: org.hibernate.dialect.H2Dialect
   liquibase:
     contexts: test
+eureka:
+  client:
+    enabled: false
