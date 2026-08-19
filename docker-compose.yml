@@ -19,6 +19,8 @@ services:
       timeout: 3s
       retries: 5
       start_period: 10s
+    networks:
+      - ticketly-net
 
   redis:
     image: redis:7
@@ -31,15 +33,72 @@ services:
       timeout: 3s
       retries: 5
       start_period: 5s
+    networks:
+      - ticketly-net
+
+  # ==========================================
+  # Service Discovery
+  # ==========================================
+  eureka:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        MODULE: eureka-server
+    container_name: eureka
+    hostname: eureka
+    ports:
+      - "8761:8761"
+    environment:
+      - SERVER_PORT=8761
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "-q", "http://localhost:8761/actuator/health" ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 15s
+    networks:
+      - ticketly-net
+
+  # ==========================================
+  # Gateway
+  # ==========================================
+  gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        MODULE: gateway
+    container_name: gateway
+    hostname: gateway
+    ports:
+      - "8080:8080"
+    environment:
+      - SERVER_PORT=8080
+      - DEFAULT_ZONE=http://eureka:8761/eureka/
+    depends_on:
+      eureka:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "-q", "http://localhost:8080/actuator/health" ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 15s
+    networks:
+      - ticketly-net
 
   # ==========================================
   # Microservices
   # ==========================================
   ticketing-service:
     build:
-      context: ./ticketing-service       
-      dockerfile: Dockerfile             
+      context: .
+      dockerfile: Dockerfile
+      args:
+        MODULE: ticketing-service
     container_name: ticketing-service
+    hostname: ticketing-service
     ports:
       - "8081:8081"
     environment:
@@ -50,12 +109,89 @@ services:
       - DB_PASSWORD=ticketly
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+      - DEFAULT_ZONE=http://eureka:8761/eureka/
     depends_on:
       db:
         condition: service_healthy
       redis:
         condition: service_healthy
-        
+      eureka:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "-q", "http://localhost:8081/actuator/health" ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 20s
+    networks:
+      - ticketly-net
+
+  payment-service-1:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        MODULE: payment-service
+    container_name: payment-service-1
+    hostname: payment-service-1
+    ports:
+      - "8082:8082"
+    environment:
+      - SERVER_PORT=8082
+      - SPRING_PROFILES_ACTIVE=prod
+      - DB_URL=jdbc:postgresql://db:5432/ticketly
+      - DB_USERNAME=ticketly
+      - DB_PASSWORD=ticketly
+      - DEFAULT_ZONE=http://eureka:8761/eureka/
+    depends_on:
+      db:
+        condition: service_healthy
+      eureka:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "-q", "http://localhost:8080/actuator/health" ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 20s
+    networks:
+      - ticketly-net
+
+  payment-service-2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        MODULE: payment-service
+    container_name: payment-service-2
+    hostname: payment-service-2
+    ports:
+      - "8083:8083"
+    environment:
+      - SERVER_PORT=8083
+      - SPRING_PROFILES_ACTIVE=prod
+      - DB_URL=jdbc:postgresql://db:5432/ticketly
+      - DB_USERNAME=ticketly
+      - DB_PASSWORD=ticketly
+      - DEFAULT_ZONE=http://eureka:8761/eureka/
+    depends_on:
+      db:
+        condition: service_healthy
+      eureka:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "-q", "http://localhost:8080/actuator/health" ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 20s
+    networks:
+      - ticketly-net
+
+networks:
+  ticketly-net:
+    driver: bridge
+
 volumes:
   postgres_data:
     driver: local
