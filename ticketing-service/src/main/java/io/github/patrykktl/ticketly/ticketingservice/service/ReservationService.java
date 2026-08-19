@@ -1,12 +1,14 @@
 package io.github.patrykktl.ticketly.ticketingservice.service;
 
+import io.github.patrykktl.ticketly.ticketingservice.client.PaymentClient;
 import io.github.patrykktl.ticketly.ticketingservice.exception.InvalidStatusException;
 import io.github.patrykktl.ticketly.ticketingservice.exception.NoAvailableSeatsException;
-import io.github.patrykktl.ticketly.ticketingservice.exception.ReservationExpiredException;
 import io.github.patrykktl.ticketly.ticketingservice.exception.SeatLimitReachedException;
 import io.github.patrykktl.ticketly.ticketingservice.mapper.ReservationMapper;
 import io.github.patrykktl.ticketly.ticketingservice.model.Event;
 import io.github.patrykktl.ticketly.ticketingservice.model.EventStatus;
+import io.github.patrykktl.ticketly.ticketingservice.model.PaymentRequest;
+import io.github.patrykktl.ticketly.ticketingservice.model.PaymentResponse;
 import io.github.patrykktl.ticketly.ticketingservice.model.Reservation;
 import io.github.patrykktl.ticketly.ticketingservice.model.ReservationStatus;
 import io.github.patrykktl.ticketly.ticketingservice.model.command.CreateReservationCommand;
@@ -31,6 +33,8 @@ public class ReservationService {
     private final ReservationRepository reservationRepository;
     private final EventRepository eventRepository;
     private final TicketlyProperties properties;
+    private final PaymentClient paymentClient;
+    private final ReservationTxHelper txHelper;
 
     @Transactional
     @Caching(evict = {
@@ -71,20 +75,11 @@ public class ReservationService {
         return ReservationMapper.mapToDto(reservationRepository.save(reservation));
     }
 
-    // M11: payment happens here
-    @Transactional
     public ReservationDto confirm(Integer reservationId) {
-        Reservation reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new EntityNotFoundException("Reservation of given id cannot be found."));
-
-        if (!reservation.getStatus().equals(ReservationStatus.PENDING_PAYMENT)) {
-            throw new InvalidStatusException("Reservation cannot be confirmed.");
-        }
-        if (!reservation.getHoldExpiresAt().isAfter(LocalDateTime.now())) {
-            throw new ReservationExpiredException("Reservation has already expired.");
-        }
-        reservation.setStatus(ReservationStatus.CONFIRMED);
-        return ReservationMapper.mapToDto(reservation);
+        Reservation reservation = txHelper.getAndValidateForConfirmation(reservationId);
+        PaymentRequest paymentRequest = new PaymentRequest(reservation.getId(), reservation.getTotalPrice());
+        PaymentResponse paymentResponse = paymentClient.charge(paymentRequest);
+        return txHelper.recordPaymentOutcome(reservationId, paymentResponse);
     }
 
     public ReservationDto findById(Integer reservationId) {

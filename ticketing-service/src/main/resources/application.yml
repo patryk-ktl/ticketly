@@ -7,9 +7,37 @@ spring:
     enabled: true
   cache:
     type: redis
+  cloud:
+    openfeign:
+      client:
+        config:
+          payment-service:
+            connect-timeout: 2000
+            read-timeout: 5000
+            logger-level: full
+      circuitbreaker:
+        enabled: true
+  application:
+    name: ticketing-service
+resilience4j:
+  circuitbreaker:
+    instances:
+      payment-service:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state:
+          seconds: 15
+        permitted-number-of-calls-in-half-open-state: 3
 ticketly:
   max-seats-per-reservation: ${MAX_SEATS_PER_RESERVATION:10}
   seat-hold-minutes: ${SEAT_HOLD_MINUTES:15}
   service-fee-percent: ${SERVICE_FEE_PERCENT:0.1}
   hold-cleanup-cron: ${HOLD_CLEANUP_CRON:0 * * * * *}
   finish-events-cron: ${FINISH_EVENTS_CRON:0 0 * * * *}
+eureka:
+  instance:
+    instance-id: ticketing-service:${random.value}
+    prefer-ip-address: true
+  client:
+    service-url:
+      defaultZone: ${DEFAULT_ZONE:http://localhost:8761/eureka/}

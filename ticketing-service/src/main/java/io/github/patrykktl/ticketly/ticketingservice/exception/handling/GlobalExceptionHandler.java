@@ -1,7 +1,9 @@
 package io.github.patrykktl.ticketly.ticketingservice.exception.handling;
 
+import io.github.patrykktl.ticketly.ticketingservice.exception.InterruptedPaymentException;
 import io.github.patrykktl.ticketly.ticketingservice.exception.InvalidStatusException;
 import io.github.patrykktl.ticketly.ticketingservice.exception.NoAvailableSeatsException;
+import io.github.patrykktl.ticketly.ticketingservice.exception.PaymentServiceUnavailableException;
 import io.github.patrykktl.ticketly.ticketingservice.exception.ReservationExpiredException;
 import io.github.patrykktl.ticketly.ticketingservice.exception.SeatLimitReachedException;
 import jakarta.persistence.EntityNotFoundException;
@@ -25,7 +27,9 @@ public class GlobalExceptionHandler {
             ReservationExpiredException.class,
             NoAvailableSeatsException.class,
             InvalidStatusException.class,
-            SeatLimitReachedException.class
+            SeatLimitReachedException.class,
+            InterruptedPaymentException.class,
+            PaymentServiceUnavailableException.class
     })
     @ResponseStatus(HttpStatus.CONFLICT)
     public ExceptionDTO handleException(RuntimeException exception) {

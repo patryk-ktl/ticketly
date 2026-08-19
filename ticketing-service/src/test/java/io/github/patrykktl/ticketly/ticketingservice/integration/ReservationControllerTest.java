@@ -1,8 +1,12 @@
 package io.github.patrykktl.ticketly.ticketingservice.integration;
 
+import io.github.patrykktl.ticketly.ticketingservice.client.PaymentClient;
 import io.github.patrykktl.ticketly.ticketingservice.model.Conference;
 import io.github.patrykktl.ticketly.ticketingservice.model.Event;
 import io.github.patrykktl.ticketly.ticketingservice.model.EventStatus;
+import io.github.patrykktl.ticketly.ticketingservice.model.PaymentRequest;
+import io.github.patrykktl.ticketly.ticketingservice.model.PaymentResponse;
+import io.github.patrykktl.ticketly.ticketingservice.model.PaymentStatus;
 import io.github.patrykktl.ticketly.ticketingservice.model.ReservationStatus;
 import io.github.patrykktl.ticketly.ticketingservice.model.command.CreateReservationCommand;
 import io.github.patrykktl.ticketly.ticketingservice.repository.EventRepository;
@@ -14,6 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import tools.jackson.databind.ObjectMapper;
@@ -23,6 +28,8 @@ import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -44,6 +51,9 @@ class ReservationControllerTest {
 
     @Autowired
     private ReservationRepository reservationRepository;
+
+    @MockitoBean
+    private PaymentClient paymentClient;
 
     private Event testEvent;
 
@@ -72,6 +82,13 @@ class ReservationControllerTest {
 
     @Test
     void fullReservationLifecycle_ShouldSucceedAndDecreaseSeats() throws Exception {
+        PaymentResponse mockPaymentResponse = new PaymentResponse(
+                100,
+                PaymentStatus.SUCCEEDED,
+                "8082"
+        );
+        when(paymentClient.charge(any(PaymentRequest.class))).thenReturn(mockPaymentResponse);
+
         CreateReservationCommand command = CreateReservationCommand.builder()
                 .eventId(testEvent.getId())
                 .customerEmail("developer@example.com")
