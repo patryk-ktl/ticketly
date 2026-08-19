@@ -16,6 +16,17 @@ spring:
             connect-timeout: 2000
             read-timeout: 5000
             logger-level: full
+      circuitbreaker:
+        enabled: true
+resilience4j:
+  circuitbreaker:
+    instances:
+      payment-service:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state:
+          seconds: 15
+        permitted-number-of-calls-in-half-open-state: 3
 ticketly:
   max-seats-per-reservation: ${MAX_SEATS_PER_RESERVATION:10}
   seat-hold-minutes: ${SEAT_HOLD_MINUTES:15}
