@@ -1,6 +1,59 @@
 # ticketly
 Event Ticketing Platform
 
+## 🏗️ Architecture
+
+```mermaid
+flowchart TB
+    client["Client"]
+
+    subgraph platform["ticketly platform"]
+        gateway["gateway :8080\n(Spring Cloud Gateway, reactive)"]
+        eureka["eureka :8761\n(service registry)"]
+        ticketing["ticketing-service :8081\n(events, reservations)"]
+        payment1["payment-service-1 :8082"]
+        payment2["payment-service-2 :8083"]
+        db[("PostgreSQL :5432")]
+        redis[("Redis :6379")]
+    end
+
+    client -->|HTTP| gateway
+    gateway -->|lb://ticketing-service| ticketing
+    gateway -->|lb://payment-service| payment1
+    gateway -->|lb://payment-service| payment2
+
+    ticketing -.->|Feign, circuit breaker| payment1
+    ticketing -.->|Feign, circuit breaker| payment2
+
+    ticketing -->|register/discover| eureka
+    payment1 -->|register/discover| eureka
+    payment2 -->|register/discover| eureka
+    gateway -->|discover| eureka
+
+    ticketing --> db
+    payment1 --> db
+    payment2 --> db
+    ticketing --> redis
+```
+
+Requests only ever enter through the **gateway**. It resolves `ticketing-service`
+and `payment-service` by name via **Eureka**, load-balancing across replicas -
+callers never see or depend on individual instance ports. `ticketing-service`
+calls `payment-service` directly (bypassing the gateway) via a Feign client
+wrapped in a circuit breaker, so a payment-service outage degrades gracefully
+(reservation holds stay intact) rather than cascading.
+
+## 📦 Module Map
+
+| Module                         | Role                                                                                                                                  |
+|:-------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------|
+| `eureka-server`                | Service registry all other services register with and discover through                                                                |
+| `gateway`                      | Single public entry point; routes and load-balances to backend services                                                               |
+| `ticketing-service`            | Events, reservations, seat holds; calls `payment-service` to confirm payment                                                          |
+| `payment-service`              | Payment processing; run as two replicas behind the gateway/load balancer                                                              |
+| `ticketly-commons`             | Shared DTOs and error-response models used by both services and the Feign contract - kept dependency-light on purpose                 |
+| `ticketly-spring-boot-starter` | Shared observability auto-configuration (request logging filter + `@TrackExecution` AOP), opt-in via `ticketly.observability.enabled` |
+
 ## 🚀 Quick Start: Running the Stack
 
 Ensure you have Docker installed and running.
@@ -12,7 +65,6 @@ Run this single command from the root directory of the `ticketly` repository:
 ```bash
 docker compose up --build
 ```
-
 Note: To run in the background (detached mode), add the -d flag:
 ```bash
 docker compose up --build -d
