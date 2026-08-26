@@ -1,7 +1,7 @@
 package io.github.patrykktl.ticketly.paymentservice.mapper;
 
+import dto.PaymentResponse;
 import io.github.patrykktl.ticketly.paymentservice.model.Payment;
-import io.github.patrykktl.ticketly.paymentservice.model.PaymentResponse;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass

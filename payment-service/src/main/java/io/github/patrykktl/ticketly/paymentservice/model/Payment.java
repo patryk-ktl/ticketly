@@ -1,5 +1,6 @@
 package io.github.patrykktl.ticketly.paymentservice.model;
 
+import dto.PaymentStatus;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;

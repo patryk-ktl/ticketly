@@ -1,6 +1,8 @@
 package io.github.patrykktl.ticketly.paymentservice.exception.handling;
 
-import io.github.patrykktl.ticketly.paymentservice.exception.InterruptedPaymentException;
+import exception.ExceptionDTO;
+import exception.InterruptedPaymentException;
+import exception.ValidationExceptionDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;

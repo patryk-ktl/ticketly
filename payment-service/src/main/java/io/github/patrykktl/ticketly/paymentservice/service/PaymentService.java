@@ -1,12 +1,13 @@
 package io.github.patrykktl.ticketly.paymentservice.service;
 
-import io.github.patrykktl.ticketly.paymentservice.exception.InterruptedPaymentException;
+import dto.PaymentRequest;
+import dto.PaymentResponse;
+import dto.PaymentStatus;
+import exception.InterruptedPaymentException;
 import io.github.patrykktl.ticketly.paymentservice.mapper.PaymentMapper;
 import io.github.patrykktl.ticketly.paymentservice.model.Payment;
-import io.github.patrykktl.ticketly.paymentservice.model.PaymentRequest;
-import io.github.patrykktl.ticketly.paymentservice.model.PaymentResponse;
-import io.github.patrykktl.ticketly.paymentservice.model.PaymentStatus;
 import io.github.patrykktl.ticketly.paymentservice.repository.PaymentRepository;
+import observability.TrackExecution;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +29,7 @@ public class PaymentService {
     }
 
     @Transactional
+    @TrackExecution
     public PaymentResponse processPayment(PaymentRequest request) {
         simulateProcessingDelay();
 

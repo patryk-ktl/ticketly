@@ -1,4 +1,4 @@
-package io.github.patrykktl.ticketly.paymentservice.exception.handling;
+package exception;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;

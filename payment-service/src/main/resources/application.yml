@@ -16,3 +16,7 @@ eureka:
       defaultZone: ${DEFAULT_ZONE:http://localhost:8761/eureka/}
 server:
   port: ${SERVER_PORT:8082}
+ticketly:
+  observability:
+    enabled: true
+    slow-call-threshold-ms: 500

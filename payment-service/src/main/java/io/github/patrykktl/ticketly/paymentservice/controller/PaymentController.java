@@ -1,7 +1,7 @@
 package io.github.patrykktl.ticketly.paymentservice.controller;
 
-import io.github.patrykktl.ticketly.paymentservice.model.PaymentRequest;
-import io.github.patrykktl.ticketly.paymentservice.model.PaymentResponse;
+import dto.PaymentRequest;
+import dto.PaymentResponse;
 import io.github.patrykktl.ticketly.paymentservice.service.PaymentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

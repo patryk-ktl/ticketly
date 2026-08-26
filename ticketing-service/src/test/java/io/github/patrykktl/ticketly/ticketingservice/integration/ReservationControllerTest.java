@@ -1,12 +1,12 @@
 package io.github.patrykktl.ticketly.ticketingservice.integration;
 
+import dto.PaymentRequest;
+import dto.PaymentResponse;
+import dto.PaymentStatus;
 import io.github.patrykktl.ticketly.ticketingservice.client.PaymentClient;
 import io.github.patrykktl.ticketly.ticketingservice.model.Conference;
 import io.github.patrykktl.ticketly.ticketingservice.model.Event;
 import io.github.patrykktl.ticketly.ticketingservice.model.EventStatus;
-import io.github.patrykktl.ticketly.ticketingservice.model.PaymentRequest;
-import io.github.patrykktl.ticketly.ticketingservice.model.PaymentResponse;
-import io.github.patrykktl.ticketly.ticketingservice.model.PaymentStatus;
 import io.github.patrykktl.ticketly.ticketingservice.model.ReservationStatus;
 import io.github.patrykktl.ticketly.ticketingservice.model.command.CreateReservationCommand;
 import io.github.patrykktl.ticketly.ticketingservice.repository.EventRepository;

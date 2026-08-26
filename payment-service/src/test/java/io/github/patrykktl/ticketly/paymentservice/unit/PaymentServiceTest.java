@@ -1,9 +1,9 @@
 package io.github.patrykktl.ticketly.paymentservice.unit;
 
+import dto.PaymentRequest;
+import dto.PaymentResponse;
+import dto.PaymentStatus;
 import io.github.patrykktl.ticketly.paymentservice.model.Payment;
-import io.github.patrykktl.ticketly.paymentservice.model.PaymentRequest;
-import io.github.patrykktl.ticketly.paymentservice.model.PaymentResponse;
-import io.github.patrykktl.ticketly.paymentservice.model.PaymentStatus;
 import io.github.patrykktl.ticketly.paymentservice.repository.PaymentRepository;
 import io.github.patrykktl.ticketly.paymentservice.service.PaymentService;
 import org.junit.jupiter.api.BeforeEach;

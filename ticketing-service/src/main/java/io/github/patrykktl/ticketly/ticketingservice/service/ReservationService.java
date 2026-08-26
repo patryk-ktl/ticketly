@@ -1,5 +1,7 @@
 package io.github.patrykktl.ticketly.ticketingservice.service;
 
+import dto.PaymentRequest;
+import dto.PaymentResponse;
 import io.github.patrykktl.ticketly.ticketingservice.client.PaymentClient;
 import io.github.patrykktl.ticketly.ticketingservice.exception.InvalidStatusException;
 import io.github.patrykktl.ticketly.ticketingservice.exception.NoAvailableSeatsException;
@@ -7,8 +9,6 @@ import io.github.patrykktl.ticketly.ticketingservice.exception.SeatLimitReachedE
 import io.github.patrykktl.ticketly.ticketingservice.mapper.ReservationMapper;
 import io.github.patrykktl.ticketly.ticketingservice.model.Event;
 import io.github.patrykktl.ticketly.ticketingservice.model.EventStatus;
-import io.github.patrykktl.ticketly.ticketingservice.model.PaymentRequest;
-import io.github.patrykktl.ticketly.ticketingservice.model.PaymentResponse;
 import io.github.patrykktl.ticketly.ticketingservice.model.Reservation;
 import io.github.patrykktl.ticketly.ticketingservice.model.ReservationStatus;
 import io.github.patrykktl.ticketly.ticketingservice.model.command.CreateReservationCommand;
@@ -18,6 +18,7 @@ import io.github.patrykktl.ticketly.ticketingservice.repository.EventRepository;
 import io.github.patrykktl.ticketly.ticketingservice.repository.ReservationRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import observability.TrackExecution;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
@@ -41,6 +42,7 @@ public class ReservationService {
             @CacheEvict(value = "eventDetails", key = "#command.eventId"),
             @CacheEvict(value = "eventSearchResults", allEntries = true)
     })
+    @TrackExecution
     public ReservationDto createReservation(CreateReservationCommand command) {
         Event event = eventRepository.findWithLockingById(command.getEventId())
                 .orElseThrow(() -> new EntityNotFoundException("Event of given id cannot be found"));
@@ -75,6 +77,7 @@ public class ReservationService {
         return ReservationMapper.mapToDto(reservationRepository.save(reservation));
     }
 
+    @TrackExecution
     public ReservationDto confirm(Integer reservationId) {
         Reservation reservation = txHelper.getAndValidateForConfirmation(reservationId);
         PaymentRequest paymentRequest = new PaymentRequest(reservation.getId(), reservation.getTotalPrice());
