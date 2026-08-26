@@ -41,6 +41,7 @@
         <module>eureka-server</module>
         <module>gateway</module>
         <module>ticketly-commons</module>
+        <module>ticketly-spring-boot-starter</module>
     </modules>
 
     <dependencyManagement>

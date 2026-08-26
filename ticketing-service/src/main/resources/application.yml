@@ -34,6 +34,9 @@ ticketly:
   service-fee-percent: ${SERVICE_FEE_PERCENT:0.1}
   hold-cleanup-cron: ${HOLD_CLEANUP_CRON:0 * * * * *}
   finish-events-cron: ${FINISH_EVENTS_CRON:0 0 * * * *}
+  observability:
+    enabled: true
+    slow-call-threshold-ms: 500
 eureka:
   instance:
     instance-id: ticketing-service:${random.value}
